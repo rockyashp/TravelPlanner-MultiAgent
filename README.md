@@ -1,4 +1,4 @@
-# ✈️ Aura Travel — Multi-Agent Travel Planner
+# Aura Travel — Multi-Agent Travel Planner
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
@@ -9,22 +9,28 @@
 [![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-Overpass_API-7EBC6F?style=flat-square&logo=openstreetmap&logoColor=white)](https://www.openstreetmap.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
-> A full-stack, autonomous multi-agent travel itinerary planner. Powered by **FastAPI**, **LangGraph**, **Google Gemini**, and live **OpenStreetMap Overpass API**, wrapped in a modern **React + Tailwind Glassmorphism UI**.
+> An autonomous multi-agent travel itinerary planning system. Built with **FastAPI**, **LangGraph**, **Google Gemini**, and the **OpenStreetMap Overpass API**, featuring a **React + Tailwind CSS** glassmorphism user interface.
 
 ---
 
-## 🌟 Key Features
+## Overview
 
-- ⚡ **Parallel Multi-Agent Swarm**: LangGraph orchestrates concurrent execution of the **Attractions Agent** and **Culinary Agent** via async fan-out / fan-in graph topology.
-- 🆓 **100% Free & Open Ecosystem**: Zero paid Google Maps or proprietary API dependencies. Powered by Google Gemini free tier and OpenStreetMap Nominatim + Overpass APIs.
-- 📍 **Real-Time OSM Geodata**: Fetches authentic beaches, historic landmarks, scenic viewpoints, and budget-matched eateries directly from live OpenStreetMap nodes.
-- 🎨 **Sleek Glassmorphism Interface**: Fluid pastel mesh gradients, ambient floating glow orbs, `backdrop-blur-xl`, semi-transparent cards, and micro-animations.
-- 🔄 **Live Agent Flow Visualizer**: Interactive visual pipeline that reflects real-time status as each agent parses, searches, and synthesizes data.
-- 📅 **Rich Day-by-Day Timeline**: Morning, afternoon, and evening activity slots, budget-calibrated meal recommendations, local travel tips, and one-click OpenStreetMap location search links.
+Aura Travel transforms natural language travel prompts into detailed, structured, day-by-day itineraries. It coordinates multiple specialized AI agents executing in parallel to discover attractions and dining options from live geographic data sources without relying on proprietary mapping APIs.
 
 ---
 
-## 🏗️ Architecture & Multi-Agent Workflow
+## Key Features
+
+- **Parallel Multi-Agent Swarm**: LangGraph orchestrates concurrent execution of the Attractions Agent and Culinary Agent via asynchronous fan-out / fan-in graph topology.
+- **Open Data & Free-Tier Integration**: Operates without paid map API dependencies by utilizing Google Gemini (Free Tier) and OpenStreetMap (Nominatim and Overpass APIs).
+- **Real-Time Geodata Retrieval**: Queries live OpenStreetMap nodes to extract verified attractions, natural landmarks, viewpoints, and budget-matched eateries.
+- **Modern Glassmorphism UI**: Built with React, Vite, and Tailwind CSS, utilizing `backdrop-blur` treatments, dynamic gradients, and responsive layouts.
+- **Live Agent Flow Visualizer**: Provides visual feedback indicating the real-time execution state of each agent node during synthesis.
+- **Structured Day-by-Day Itineraries**: Generates morning, afternoon, and evening activity slots, meal recommendations, local travel advice, and OpenStreetMap coordinate links.
+
+---
+
+## Architecture & Workflow
 
 ```
                              ┌───────────────────────┐
@@ -47,7 +53,7 @@
                     │                                         │
                     └────────────────────┬────────────────────┘
                                          │
-                              PARALLEL FAN-IN SYNC
+                               PARALLEL FAN-IN SYNC
                                          │
                                          ▼
                              ┌───────────────────────┐
@@ -68,13 +74,13 @@
 
 ---
 
-## 🛠️ Tech Stack
+## Technology Stack
 
 | Domain | Technologies & Libraries |
 |---|---|
 | **Backend Framework** | [FastAPI](https://fastapi.tiangolo.com/), [Uvicorn](https://www.uvicorn.org/), [Pydantic v2](https://docs.pydantic.dev/) |
 | **Agent Orchestration** | [LangGraph](https://github.com/langchain-ai/langgraph), [LangChain Core](https://python.langchain.com/) |
-| **LLM & Intelligence** | [Google Gemini 2.5 / 1.5 Flash](https://aistudio.google.com) (`google-genai` SDK) |
+| **Language Model** | [Google Gemini 2.5 / 1.5 Flash](https://aistudio.google.com) (`google-genai` SDK) |
 | **Geodata & Places** | [OpenStreetMap Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API), [Nominatim Geocoding](https://nominatim.org/) |
 | **Frontend Framework** | [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/) |
 | **Styling & UI** | [Tailwind CSS 3.4](https://tailwindcss.com/), [Lucide Icons](https://lucide.dev/), [Canvas Confetti](https://www.npmjs.com/package/canvas-confetti) |
@@ -82,7 +88,7 @@
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 TravelPlanner-MultiAgent/
@@ -108,8 +114,8 @@ TravelPlanner-MultiAgent/
 └── frontend/
     ├── src/
     │   ├── components/
-    │   │   ├── BackgroundGradients.tsx # Animated pastel mesh & glowing orbs
-    │   │   ├── Header.tsx              # Glassmorphic navbar with backend health status
+    │   │   ├── BackgroundGradients.tsx # Animated pastel mesh & background elements
+    │   │   ├── Header.tsx              # Navigation bar with backend health indicator
     │   │   ├── PromptInput.tsx         # Natural language prompt area & quick presets
     │   │   ├── AgentFlowVisualizer.tsx # Multi-agent execution graph visualizer
     │   │   ├── ItineraryView.tsx       # Interactive day cards & OpenStreetMap links
@@ -118,7 +124,7 @@ TravelPlanner-MultiAgent/
     │   │   └── api.ts                  # Axios backend API client
     │   ├── types/
     │   │   └── travel.ts               # TypeScript interfaces for trip models
-    │   ├── App.tsx                     # Main page orchestrator
+    │   ├── App.tsx                     # Main application container
     │   └── index.css                   # Tailwind directives & glassmorphic utility classes
     ├── package.json
     └── vite.config.ts
@@ -126,25 +132,25 @@ TravelPlanner-MultiAgent/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### 1. Prerequisites
+### Prerequisites
 
 - **Python**: 3.10 or higher
 - **Node.js**: 18.x or higher & **npm**
-- **Gemini API Key**: Obtain a free key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+- **Gemini API Key**: Obtain a key from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ---
 
-### 2. Environment Configuration
+### 1. Environment Configuration
 
 Create a `.env` file in the root directory:
 
 ```bash
-cp .env.example .env   # Or create .env manually
+cp .env.example .env
 ```
 
-Add your credentials:
+Define the required environment variables:
 
 ```env
 GEMINI_API_KEY=your_google_gemini_api_key_here
@@ -153,10 +159,10 @@ GEMINI_MODEL=gemini-2.5-flash
 
 ---
 
-### 3. Backend Setup
+### 2. Backend Setup
 
 ```bash
-# 1. Activate your virtual environment
+# Activate virtual environment
 # Windows (PowerShell):
 venv\Scripts\Activate.ps1
 # Windows (Git Bash):
@@ -164,150 +170,157 @@ source venv/Scripts/activate
 # macOS/Linux:
 source venv/bin/activate
 
-# 2. Install dependencies (if not already installed)
+# Install backend dependencies
 pip install -r backend/requirements.txt
 
-# 3. Start the FastAPI server
+# Start the FastAPI server
 cd backend
 uvicorn app.main:app --reload --port 8000
 ```
 
 - API Server: `http://localhost:8000`
-- Interactive OpenAPI Docs: `http://localhost:8000/docs`
+- Interactive OpenAPI Documentation: `http://localhost:8000/docs`
 
 ---
 
-### 4. Frontend Setup
+### 3. Frontend Setup
 
-In a new terminal window:
+In a separate terminal window:
 
 ```bash
 cd frontend
 
-# 1. Install dependencies
+# Install frontend dependencies
 npm install
 
-# 2. Start the Vite development server
+# Start the Vite development server
 npm run dev
 ```
 
-- Web UI: `http://localhost:5173`
+- Application UI: `http://localhost:5173`
 
 ---
 
-## 📡 API Reference
+## API Reference
 
 ### Health Check
-- **Endpoint**: `GET /health`
-- **Response**:
-  ```json
-  {
-    "status": "ok",
-    "service": "Multi-Agent Travel Planner"
-  }
-  ```
 
-### Generate Trip Plan
-- **Endpoint**: `POST /api/plan-trip`
-- **Headers**: `Content-Type: application/json`
-- **Request Body**:
-  ```json
-  {
-    "query": "I want to go to Goa for 2 days, low budget, want to eat seafood and see quiet beaches."
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "success": true,
-    "itinerary": {
-      "destination": "Goa, India",
-      "duration_days": 2,
-      "budget": "low",
-      "vibe": "quiet beaches, seafood",
-      "summary": "A 2-day budget-friendly coastal getaway featuring serene sands and authentic Goan seafood.",
-      "days": [
-        {
-          "day": 1,
-          "title": "Coastal Heritage & Sunset Serenity",
-          "morning": {
-            "time": "09:00 AM - 12:00 PM",
-            "activity": "Explore historic Chapora Fort ruins and coastal vistas",
-            "location": "Chapora Fort",
-            "lat": 15.605,
-            "lon": 73.738,
-            "notes": "Free entry, carry water and wear comfortable walking shoes."
-          },
-          "afternoon": {
-            "time": "01:00 PM - 04:30 PM",
-            "activity": "Relax at secluded Ashvem Beach",
-            "location": "Ashvem Beach",
-            "lat": 15.658,
-            "lon": 73.717,
-            "notes": "Ideal for swimming and peaceful seaside relaxation."
-          },
-          "evening": {
-            "time": "05:30 PM - 08:00 PM",
-            "activity": "Sunset stroll and fresh catch dinner by the shore",
-            "location": "Morjim Coast",
-            "lat": 15.632,
-            "lon": 73.734,
-            "notes": "Scenic sunset viewpoint with budget beach shacks."
-          },
-          "meals": [
-            {
-              "type": "Lunch",
-              "name": "Local Goan Beach Shack",
-              "cuisine": "Goan Seafood / Thali",
-              "price_range": "$",
-              "address": "Ashvem Beach Road"
-            }
-          ]
-        }
-      ],
-      "practical_tips": [
-        "Rent a scooter for affordable local transit (~$5/day).",
-        "Look for local fish thali meals for authentic food at budget prices."
-      ],
-      "estimated_daily_budget": "$25 - $35 USD per person"
-    },
-    "meta": {
-      "location": "Goa, India",
-      "city": "Panaji",
-      "attractions_found": 25,
-      "food_spots_found": 20
-    }
-  }
-  ```
+`GET /health`
+
+**Response:**
+```json
+{
+  "status": "ok",
+  "service": "Multi-Agent Travel Planner"
+}
+```
 
 ---
 
-## 🧪 Testing & Verification
+### Generate Trip Plan
 
-Run the automated test suite to ensure multi-agent orchestration and live OSM integrations are working seamlessly:
+`POST /api/plan-trip`
+
+**Headers:**
+`Content-Type: application/json`
+
+**Request Body:**
+```json
+{
+  "query": "I want to go to Goa for 2 days, low budget, want to eat seafood and see quiet beaches."
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "itinerary": {
+    "destination": "Goa, India",
+    "duration_days": 2,
+    "budget": "low",
+    "vibe": "quiet beaches, seafood",
+    "summary": "A 2-day budget-friendly coastal getaway featuring serene sands and authentic Goan seafood.",
+    "days": [
+      {
+        "day": 1,
+        "title": "Coastal Heritage & Sunset Serenity",
+        "morning": {
+          "time": "09:00 AM - 12:00 PM",
+          "activity": "Explore historic Chapora Fort ruins and coastal vistas",
+          "location": "Chapora Fort",
+          "lat": 15.605,
+          "lon": 73.738,
+          "notes": "Free entry, carry water and wear comfortable walking shoes."
+        },
+        "afternoon": {
+          "time": "01:00 PM - 04:30 PM",
+          "activity": "Relax at secluded Ashvem Beach",
+          "location": "Ashvem Beach",
+          "lat": 15.658,
+          "lon": 73.717,
+          "notes": "Ideal for swimming and peaceful seaside relaxation."
+        },
+        "evening": {
+          "time": "05:30 PM - 08:00 PM",
+          "activity": "Sunset stroll and fresh catch dinner by the shore",
+          "location": "Morjim Coast",
+          "lat": 15.632,
+          "lon": 73.734,
+          "notes": "Scenic sunset viewpoint with budget beach shacks."
+        },
+        "meals": [
+          {
+            "type": "Lunch",
+            "name": "Local Goan Beach Shack",
+            "cuisine": "Goan Seafood / Thali",
+            "price_range": "$",
+            "address": "Ashvem Beach Road"
+          }
+        ]
+      }
+    ],
+    "practical_tips": [
+      "Rent a scooter for affordable local transit.",
+      "Look for local fish thali meals for authentic dining at budget prices."
+    ],
+    "estimated_daily_budget": "$25 - $35 USD per person"
+  },
+  "meta": {
+    "location": "Goa, India",
+    "city": "Panaji",
+    "attractions_found": 25,
+    "food_spots_found": 20
+  }
+}
+```
+
+---
+
+## Testing & Verification
+
+Automated test scripts are available to validate multi-agent orchestration, live geodata integration, and concurrency:
 
 ```bash
-# Verify end-to-end multi-agent pipeline
+# Verify the end-to-end multi-agent pipeline
 python test_integration.py
 
-# Verify asynchronous agent concurrency & parallel speedup
+# Verify asynchronous agent concurrency and parallel execution
 python backend/verify_concurrency.py
 ```
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! If you'd like to add new specialized agents (e.g., *Transit Agent*, *Accommodation Agent*, *Weather Agent*):
+## Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/weather-agent`)
-3. Commit your changes (`git commit -m "Add weather forecasting agent"`)
-4. Push to the branch (`git push origin feature/weather-agent`)
+2. Create a feature branch (`git checkout -b feature/new-agent`)
+3. Commit your changes (`git commit -m "Add new agent"`)
+4. Push to the branch (`git push origin feature/new-agent`)
 5. Open a Pull Request
 
 ---
 
-## 📄 License
+## License
 
-This project is open-source software licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
