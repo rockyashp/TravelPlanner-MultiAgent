@@ -1,167 +1,213 @@
 import React, { useState } from 'react';
-import { Send, Sparkles, MapPin, Compass, DollarSign, Calendar, Zap, Palmtree } from 'lucide-react';
+import { Send, Sparkles, MapPin, Calendar, IndianRupee, Users, Compass } from 'lucide-react';
 
-interface PromptInputProps {
-  onSubmit: (prompt: string) => void;
+interface Props {
+  onSubmit: (query: string) => void;
   isLoading: boolean;
 }
 
-const EXAMPLE_PROMPTS = [
-  {
-    label: "Goa (2 Days, Seafood & Beaches)",
-    text: "I want to go to Goa for 2 days, low budget, want to eat seafood and see quiet beaches.",
-    icon: Palmtree,
-    badge: "Recommended Test",
-  },
-  {
-    label: "Tokyo (3 Days, Street Food & Neon)",
-    text: "3 days in Tokyo, medium budget, focusing on authentic ramen, anime culture, and historic shrines.",
-    icon: Compass,
-    badge: "Culture & Food",
-  },
-  {
-    label: "Paris (4 Days, Art & Cafes)",
-    text: "4 days in Paris on a romantic vibe, moderate budget, hidden art museums, bakery crawls, and evening walks.",
-    icon: MapPin,
-    badge: "Romantic",
-  },
-  {
-    label: "Kerala (5 Days, Backwaters & Tea)",
-    text: "5 days relaxed backpacking in Kerala, low budget, peaceful backwaters, spice plantations, and vegan food.",
-    icon: Zap,
-    badge: "Nature",
-  },
+const SAMPLE_PROMPTS = [
+  'Trip from Mumbai to Goa for 3 days for a couple, budget ₹25,000, seafood & beach sunsets',
+  'Solo backpacker 4-day trip from Delhi to Manali, budget ₹12,000, trekking & local cafes',
+  'Family vacation from Bangalore to Kerala for 5 days, moderate budget, backwaters & ayurveda',
+  'Weekend road trip from Pune to Mahabaleshwar for friends, scenic viewpoints & strawberry farms',
 ];
 
-export const PromptInput: React.FC<PromptInputProps> = ({ onSubmit, isLoading }) => {
+export function PromptInput({ onSubmit, isLoading }: Props) {
   const [query, setQuery] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Structured fields for quick builder
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
+  const [days, setDays] = useState('3');
+  const [budgetInr, setBudgetInr] = useState('₹25,000');
+  const [party, setParty] = useState('Couple');
+  const [vibe, setVibe] = useState('Beaches & Local Cuisine');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim() || isLoading) return;
-    onSubmit(query.trim());
+    if (query.trim() && !isLoading) {
+      onSubmit(query.trim());
+    }
   };
 
-  const handleSelectExample = (text: string) => {
-    setQuery(text);
+  const handleBuildQuery = () => {
+    const orig = origin.trim() || 'Mumbai';
+    const dest = destination.trim() || 'Goa';
+    const constructed = `Plan a ${days}-day trip from ${orig} to ${dest} for a ${party.toLowerCase()}, budget ${budgetInr}, focusing on ${vibe}.`;
+    setQuery(constructed);
+    onSubmit(constructed);
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 my-6">
-      {/* Main Glassmorphic Container */}
-      <div className="relative rounded-3xl bg-white/25 backdrop-blur-xl border border-white/40 shadow-2xl p-6 sm:p-8 transition-all duration-300 hover:border-white/60">
-        {/* Glow Accent Top Corner */}
-        <div className="absolute top-0 right-10 w-48 h-20 bg-gradient-to-r from-pink-300/30 to-purple-300/30 blur-2xl pointer-events-none" />
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 my-4 sm:my-6 animate-fade-in">
+      <div className="rounded-3xl bg-white/30 backdrop-blur-xl border border-white/50 p-5 sm:p-7 shadow-2xl relative overflow-hidden">
+        {/* Soft Background Accent Orb */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-200/30 via-purple-200/20 to-pink-200/20 rounded-full blur-2xl pointer-events-none" />
 
-        {/* Hero Section Header */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/50 backdrop-blur-md border border-white/60 text-xs font-semibold text-slate-700 mb-3 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-pink-500 animate-pulse" />
-            <span>Multi-Agent Swarm • Gemini + Overpass OSM</span>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-indigo-600" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                AI Travel Query Prompt (INR ₹ Standard)
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50/80 px-2.5 py-1 rounded-xl border border-indigo-200/60 transition-all"
+            >
+              {showAdvanced ? 'Simple Input' : '⚡ Trip Builder Form'}
+            </button>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 mb-3 leading-tight">
-            Where does your next story begin?
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 max-w-xl mx-auto">
-            Describe your ideal trip in natural language. Our parallel agents scour live attractions, local culinary spots, and craft a bespoke day-by-day itinerary.
-          </p>
-        </div>
 
-        {/* Text Area Form */}
-        <form onSubmit={handleSubmit} className="relative mt-4">
-          <div className="relative rounded-2xl overflow-hidden bg-white/40 backdrop-blur-md border border-white/50 focus-within:border-indigo-300 focus-within:bg-white/60 focus-within:ring-4 focus-within:ring-indigo-100/50 shadow-inner transition-all duration-300">
-            <textarea
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              disabled={isLoading}
-              placeholder="e.g., I want to go to Goa for 2 days, low budget, want to eat seafood and see quiet beaches..."
-              rows={4}
-              className="w-full p-4 sm:p-5 bg-transparent resize-none border-none outline-none text-slate-800 placeholder-slate-400 text-base sm:text-lg leading-relaxed focus:ring-0 disabled:opacity-50"
-            />
-
-            {/* Bottom Form Actions Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:px-5 sm:py-3 bg-white/30 backdrop-blur-sm border-t border-white/40">
-              {/* Feature Chips */}
-              <div className="flex items-center space-x-2 sm:space-x-3 text-xs text-slate-500">
-                <span className="inline-flex items-center gap-1 bg-white/50 px-2.5 py-1 rounded-lg border border-white/60">
-                  <Calendar className="w-3 h-3 text-sky-500" />
-                  Auto Duration
-                </span>
-                <span className="inline-flex items-center gap-1 bg-white/50 px-2.5 py-1 rounded-lg border border-white/60">
-                  <DollarSign className="w-3 h-3 text-emerald-500" />
-                  Budget Filter
-                </span>
-                <span className="hidden sm:inline-flex items-center gap-1 bg-white/50 px-2.5 py-1 rounded-lg border border-white/60">
-                  <Palmtree className="w-3 h-3 text-rose-500" />
-                  Vibe Search
-                </span>
+          {/* Structured Trip Builder Form */}
+          {showAdvanced ? (
+            <div className="space-y-4 mb-4 pt-2 border-t border-white/40">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 flex items-center mb-1">
+                    <MapPin className="w-3 h-3 mr-1 text-sky-600" /> Origin City
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Mumbai, Delhi, Bangalore"
+                    value={origin}
+                    onChange={(e) => setOrigin(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-2xl bg-white/60 border border-white/60 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 flex items-center mb-1">
+                    <Compass className="w-3 h-3 mr-1 text-rose-600" /> Destination
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Goa, Manali, Kerala, Jaipur"
+                    value={destination}
+                    onChange={(e) => setDestination(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-2xl bg-white/60 border border-white/60 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  />
+                </div>
               </div>
 
-              {/* Submit Button */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 flex items-center mb-1">
+                    <Calendar className="w-3 h-3 mr-1 text-indigo-600" /> Duration
+                  </label>
+                  <select
+                    value={days}
+                    onChange={(e) => setDays(e.target.value)}
+                    className="w-full px-3 py-2 rounded-2xl bg-white/60 border border-white/60 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  >
+                    <option value="2">2 Days (Weekend)</option>
+                    <option value="3">3 Days (Short Trip)</option>
+                    <option value="4">4 Days (Standard)</option>
+                    <option value="5">5 Days (Extended)</option>
+                    <option value="7">7 Days (Full Week)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 flex items-center mb-1">
+                    <IndianRupee className="w-3 h-3 mr-1 text-emerald-600" /> Total Budget
+                  </label>
+                  <select
+                    value={budgetInr}
+                    onChange={(e) => setBudgetInr(e.target.value)}
+                    className="w-full px-3 py-2 rounded-2xl bg-white/60 border border-white/60 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  >
+                    <option value="₹12,000">Budget (₹12,000)</option>
+                    <option value="₹25,000">Moderate (₹25,000)</option>
+                    <option value="₹45,000">Comfort (₹45,000)</option>
+                    <option value="₹75,000">Luxury (₹75,000+)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 flex items-center mb-1">
+                    <Users className="w-3 h-3 mr-1 text-purple-600" /> Party Type
+                  </label>
+                  <select
+                    value={party}
+                    onChange={(e) => setParty(e.target.value)}
+                    className="w-full px-3 py-2 rounded-2xl bg-white/60 border border-white/60 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  >
+                    <option value="Solo">Solo Traveler</option>
+                    <option value="Couple">Couple</option>
+                    <option value="Friends">Friends Group</option>
+                    <option value="Family">Family with Kids</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 flex items-center mb-1">
+                    ✨ Travel Vibe
+                  </label>
+                  <input
+                    type="text"
+                    value={vibe}
+                    onChange={(e) => setVibe(e.target.value)}
+                    placeholder="e.g. Food, Temples, Sunsets"
+                    className="w-full px-3 py-2 rounded-2xl bg-white/60 border border-white/60 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  />
+                </div>
+              </div>
+
               <button
-                type="submit"
-                disabled={isLoading || !query.trim()}
-                className={`relative inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 shadow-md ${
-                  isLoading || !query.trim()
-                    ? 'bg-slate-200/80 text-slate-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white hover:opacity-95 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95'
-                }`}
+                type="button"
+                onClick={handleBuildQuery}
+                disabled={isLoading}
+                className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-extrabold shadow-md hover:shadow-lg transition-all"
               >
-                {isLoading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Orchestrating Agents...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    <span>Generate Itinerary</span>
-                    <Send className="w-3.5 h-3.5 ml-0.5" />
-                  </>
-                )}
+                {isLoading ? 'Generating Multi-Agent Plan...' : '🚀 Launch Multi-Agent Plan (INR ₹)'}
               </button>
             </div>
-          </div>
-        </form>
+          ) : null}
 
-        {/* Preset Inspirations / Quick Fill Buttons */}
-        <div className="mt-6 pt-5 border-t border-white/30">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-            ✨ Quick Inspirations (Click to test):
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {EXAMPLE_PROMPTS.map((ex, index) => {
-              const Icon = ex.icon;
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => handleSelectExample(ex.text)}
-                  disabled={isLoading}
-                  className="flex items-start space-x-3 p-3 rounded-2xl bg-white/30 hover:bg-white/60 border border-white/40 hover:border-white/70 text-left transition-all duration-200 group shadow-sm disabled:opacity-50"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-white/70 border border-white/80 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                    <Icon className="w-4 h-4 text-indigo-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-800 truncate">
-                        {ex.label}
-                      </span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-50/80 text-indigo-700 font-medium ml-1">
-                        {ex.badge}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
-                      {ex.text}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
+          {/* Natural Language Prompt Input */}
+          <form onSubmit={handleSubmit} className="flex items-center space-x-2">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="e.g. Plan a 3-day trip from Delhi to Goa for a couple, budget ₹25,000, seafood & sunsets..."
+              disabled={isLoading}
+              className="flex-1 px-4 py-3 sm:py-3.5 rounded-2xl bg-white/60 backdrop-blur-md border border-white/60 text-xs sm:text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 shadow-inner"
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !query.trim()}
+              className="px-5 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-xs sm:text-sm flex items-center space-x-1.5 shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+            >
+              <span>{isLoading ? 'Planning...' : 'Plan Trip'}</span>
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          </form>
+
+          {/* Quick Clickable Suggestions */}
+          <div className="mt-3 flex items-center space-x-1.5 overflow-x-auto pb-1 text-[11px] text-slate-600">
+            <span className="font-bold text-slate-500 shrink-0">Try:</span>
+            {SAMPLE_PROMPTS.map((prompt, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => {
+                  setQuery(prompt);
+                  onSubmit(prompt);
+                }}
+                disabled={isLoading}
+                className="whitespace-nowrap px-2.5 py-1 rounded-xl bg-white/50 hover:bg-white/80 border border-white/60 text-slate-700 hover:text-indigo-700 transition-all truncate max-w-[280px]"
+              >
+                {prompt}
+              </button>
+            ))}
           </div>
         </div>
       </div>
     </div>
   );
-};
+}

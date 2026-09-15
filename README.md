@@ -1,4 +1,4 @@
-# Aura Travel — Multi-Agent Travel Planner
+# SAFAR-AI — Multi-Agent Travel Planner
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
@@ -9,13 +9,13 @@
 [![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-Overpass_API-7EBC6F?style=flat-square&logo=openstreetmap&logoColor=white)](https://www.openstreetmap.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
-> An autonomous multi-agent travel itinerary planning system. Built with **FastAPI**, **LangGraph**, **Google Gemini**, and the **OpenStreetMap Overpass API**, featuring a **React + Tailwind CSS** glassmorphism user interface.
+> **SAFAR-AI**: An autonomous multi-agent travel itinerary planning system. Built with **FastAPI**, **LangGraph**, **Google Gemini**, and the **OpenStreetMap Overpass API**, featuring a **React + Tailwind CSS** glassmorphism user interface.
 
 ---
 
 ## Overview
 
-Aura Travel transforms natural language travel prompts into detailed, structured, day-by-day itineraries. It coordinates multiple specialized AI agents executing in parallel to discover attractions and dining options from live geographic data sources without relying on proprietary mapping APIs.
+**SAFAR-AI** transforms natural language travel prompts into detailed, structured, day-by-day itineraries. It coordinates multiple specialized AI agents executing in parallel to discover attractions and dining options from live geographic data sources without relying on proprietary mapping APIs.
 
 ---
 

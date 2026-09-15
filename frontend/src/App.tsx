@@ -5,26 +5,42 @@ import { PromptInput } from './components/PromptInput';
 import { AgentFlowVisualizer } from './components/AgentFlowVisualizer';
 import { ItineraryView } from './components/ItineraryView';
 import { EmptyState } from './components/EmptyState';
-import { generateItinerary, checkBackendHealth } from './services/api';
-import type { Itinerary, AgentMeta, AgentPipelineProgress } from './types/travel';
+import { generateItinerary, streamItinerary, checkBackendHealth } from './services/api';
+import type {
+  Itinerary,
+  TripMeta,
+  TransitData,
+  WeatherData,
+  BudgetBreakdownINR,
+  SafetyAndPackingData,
+  AgentPipelineProgress,
+} from './types/travel';
 import { AlertCircle } from 'lucide-react';
+
+const INITIAL_PROGRESS: AgentPipelineProgress = {
+  intent_agent: 'idle',
+  attractions: 'idle',
+  culinary: 'idle',
+  weather: 'idle',
+  transit: 'idle',
+  budget_safety: 'idle',
+  synthesizer: 'idle',
+};
 
 export function App() {
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [itinerary, setItinerary] = useState<Itinerary | null>(null);
-  const [meta, setMeta] = useState<AgentMeta | undefined>(undefined);
+  const [transit, setTransit] = useState<TransitData | undefined>(undefined);
+  const [meta, setMeta] = useState<TripMeta | undefined>(undefined);
+  const [weather, setWeather] = useState<WeatherData | undefined>(undefined);
+  const [budget, setBudget] = useState<BudgetBreakdownINR | undefined>(undefined);
+  const [safety, setSafety] = useState<SafetyAndPackingData | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
-  // Agent flow visualizer state
-  const [agentProgress, setAgentProgress] = useState<AgentPipelineProgress>({
-    intentParser: 'idle',
-    attractionsAgent: 'idle',
-    culinaryAgent: 'idle',
-    synthesizer: 'idle',
-  });
+  const [agentProgress, setAgentProgress] = useState<AgentPipelineProgress>(INITIAL_PROGRESS);
 
-  // Check backend health on mount & periodically
+  // Check backend health periodically
   useEffect(() => {
     let mounted = true;
     const verifyHealth = async () => {
@@ -44,93 +60,113 @@ export function App() {
     setIsLoading(true);
     setError(null);
     setItinerary(null);
+    setTransit(undefined);
     setMeta(undefined);
+    setWeather(undefined);
+    setBudget(undefined);
+    setSafety(undefined);
+    setAgentProgress(INITIAL_PROGRESS);
 
-    // Initial agent visualizer state: Intent Parser starts
-    setAgentProgress({
-      intentParser: 'running',
-      attractionsAgent: 'idle',
-      culinaryAgent: 'idle',
-      synthesizer: 'idle',
-    });
+    let streamCleanedUp = false;
 
-    // Step 2 timer: Intent Parser finishes -> Attractions and Culinary run IN PARALLEL
-    const parallelTimer = setTimeout(() => {
-      setAgentProgress({
-        intentParser: 'completed',
-        attractionsAgent: 'running',
-        culinaryAgent: 'running',
-        synthesizer: 'idle',
-      });
-    }, 1800);
-
-    // Step 3 timer: Parallel agents finish -> Synthesizer runs
-    const synthTimer = setTimeout(() => {
-      setAgentProgress({
-        intentParser: 'completed',
-        attractionsAgent: 'completed',
-        culinaryAgent: 'completed',
-        synthesizer: 'running',
-      });
-    }, 4500);
-
-    try {
-      const response = await generateItinerary(query);
-
-      clearTimeout(parallelTimer);
-      clearTimeout(synthTimer);
-
-      setAgentProgress({
-        intentParser: 'completed',
-        attractionsAgent: 'completed',
-        culinaryAgent: 'completed',
-        synthesizer: 'completed',
-      });
-
-      if (response.success && response.itinerary) {
-        setItinerary(response.itinerary);
-        setMeta(response.meta);
-      } else {
-        setError(response.error || 'Failed to generate itinerary. Please try again.');
+    // Launch SSE Streaming client
+    const stopStream = streamItinerary(
+      query,
+      // onAgentUpdate
+      (node, status) => {
+        setAgentProgress((prev) => ({
+          ...prev,
+          [node]: status === 'started' ? 'running' : status === 'completed' ? 'completed' : 'error',
+        }));
+      },
+      // onComplete
+      (res) => {
+        streamCleanedUp = true;
+        setAgentProgress({
+          intent_agent: 'completed',
+          attractions: 'completed',
+          culinary: 'completed',
+          weather: 'completed',
+          transit: 'completed',
+          budget_safety: 'completed',
+          synthesizer: 'completed',
+        });
+        if (res.success && res.itinerary) {
+          setItinerary(res.itinerary);
+          setTransit(res.transit);
+          setMeta(res.meta);
+          setWeather(res.weather);
+          setBudget(res.budget_breakdown);
+          setSafety(res.safety);
+        } else {
+          setError(res.error || 'Failed to generate itinerary. Please try again.');
+        }
+        setIsLoading(false);
+      },
+      // onError — Graceful fallback to blocking POST
+      async () => {
+        if (streamCleanedUp) return;
+        try {
+          const res = await generateItinerary(query);
+          setAgentProgress({
+            intent_agent: 'completed',
+            attractions: 'completed',
+            culinary: 'completed',
+            weather: 'completed',
+            transit: 'completed',
+            budget_safety: 'completed',
+            synthesizer: 'completed',
+          });
+          if (res.success && res.itinerary) {
+            setItinerary(res.itinerary);
+            setTransit(res.transit);
+            setMeta(res.meta);
+            setWeather(res.weather);
+            setBudget(res.budget_breakdown);
+            setSafety(res.safety);
+          } else {
+            setError(res.error || 'Failed to generate itinerary.');
+          }
+        } catch (err: any) {
+          setError(err.message || 'Unable to connect to the backend server.');
+          setAgentProgress({
+            intent_agent: 'error',
+            attractions: 'error',
+            culinary: 'error',
+            weather: 'error',
+            transit: 'error',
+            budget_safety: 'error',
+            synthesizer: 'error',
+          });
+        } finally {
+          setIsLoading(false);
+        }
       }
-    } catch (err: any) {
-      clearTimeout(parallelTimer);
-      clearTimeout(synthTimer);
-      console.error('Plan trip error:', err);
-      setError(
-        err.message || 'Unable to connect to the backend server. Make sure FastAPI is running on port 8000.'
-      );
-      setAgentProgress({
-        intentParser: 'error',
-        attractionsAgent: 'error',
-        culinaryAgent: 'error',
-        synthesizer: 'error',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    );
+
+    return () => stopStream();
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative text-slate-800">
-      {/* Animated fluid pastel background mesh */}
+    <div className="min-h-screen flex flex-col relative text-slate-800 font-sans">
+      {/* Fluid animated pastel background mesh */}
       <BackgroundGradients />
 
-      {/* Top Header */}
+      {/* Header */}
       <Header backendOnline={backendOnline} />
 
-      {/* Main Content Area */}
+      {/* Main Container */}
       <main className="flex-1 flex flex-col">
-        {/* Prompt Input Component */}
+        {/* Dynamic Prompt / Trip Builder Input */}
         <PromptInput onSubmit={handlePlanTrip} isLoading={isLoading} />
 
-        {/* Live LangGraph Flow Visualizer (Shown during generation) */}
+        {/* Live LangGraph 7-Agent Architecture Radar */}
         <AgentFlowVisualizer progress={agentProgress} isLoading={isLoading} />
 
-        {/* Error Banner */}
+        {/* Error Notice */}
         {error && (
           <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 my-4 animate-fade-in">
-            <div className="p-4 sm:p-5 rounded-2xl bg-rose-50/80 backdrop-blur-md border border-rose-200/80 text-rose-800 shadow-lg flex items-start space-x-3">
+            <div className="p-4 sm:p-5 rounded-2xl bg-rose-50/80 backdrop-blur-md border border-rose-200 text-rose-800 shadow-lg flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
               <div className="flex-1 text-sm">
                 <p className="font-bold">Trip Planning Notice</p>
@@ -143,9 +179,16 @@ export function App() {
           </div>
         )}
 
-        {/* Itinerary Results View */}
+        {/* Master Itinerary Results View */}
         {itinerary && !isLoading && (
-          <ItineraryView itinerary={itinerary} meta={meta} />
+          <ItineraryView
+            itinerary={itinerary}
+            transit={transit}
+            meta={meta}
+            weather={weather}
+            budget={budget}
+            safety={safety}
+          />
         )}
 
         {/* Empty State / Pillars */}
@@ -154,12 +197,14 @@ export function App() {
 
       {/* Footer */}
       <footer className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 text-center text-xs text-slate-500">
-        <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 inline-flex flex-wrap items-center justify-center gap-3">
-          <span>✨ <strong>Aura Travel</strong> &bull; Multi-Agent Travel Planner</span>
+        <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 inline-flex flex-wrap items-center justify-center gap-3 shadow-sm">
+          <span>✨ <strong>SAFAR-AI</strong> &bull; Multi-Agent Travel Planner</span>
           <span>&bull;</span>
-          <span>LangGraph + Gemini + OpenStreetMap Overpass</span>
+          <span>INR (₹) Standardized &bull; Flights, Trains, Buses & Cabs</span>
           <span>&bull;</span>
-          <span className="text-emerald-700 font-medium">100% Free & Open Source</span>
+          <span>LangGraph + Gemini + OpenStreetMap</span>
+          <span>&bull;</span>
+          <span className="text-emerald-700 font-bold">100% Free & Open APIs</span>
         </div>
       </footer>
     </div>

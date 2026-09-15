@@ -1,6 +1,6 @@
 """
 Generate a comprehensive Architecture & Multi-Agent Specification PDF
-for the Aura Travel AI Platform using ReportLab.
+for the SAFAR-AI Platform using ReportLab.
 """
 import os
 import sys
@@ -28,21 +28,19 @@ class NumberedCanvas(canvas.Canvas):
         num_pages = len(self._saved_page_states)
         for state in self._saved_page_states:
             self.__dict__.update(state)
-            self.draw_page_decorations(num_pages)
+            self.draw_page_elements(num_pages)
             super().showPage()
         super().save()
 
-    def draw_page_decorations(self, page_count):
+    def draw_page_elements(self, page_count):
         self.saveState()
 
-        # Omit header/footer on cover page if page == 1
+        # Suppress headers on first page
         if self._pageNumber > 1:
             # Header
             self.setFont("Helvetica-Bold", 8)
-            self.setFillColor(colors.HexColor("#475569"))
-            self.drawString(54, 11 * inch - 36, "AURA TRAVEL — MULTI-AGENT ARCHITECTURE & SYSTEM DESIGN")
-            self.setFont("Helvetica", 8)
-            self.drawRightString(8.5 * inch - 54, 11 * inch - 36, "LangGraph + Gemini + OpenStreetMap")
+            self.setFillColor(colors.HexColor("#4338ca"))
+            self.drawString(54, 11 * inch - 36, "SAFAR-AI — Multi-Agent Architecture Specification")
             self.setStrokeColor(colors.HexColor("#cbd5e1"))
             self.setLineWidth(0.5)
             self.line(54, 11 * inch - 42, 8.5 * inch - 54, 11 * inch - 42)
@@ -58,7 +56,7 @@ class NumberedCanvas(canvas.Canvas):
         self.restoreState()
 
 
-def build_pdf(filename: str = "Aura_Travel_Architecture_Document.pdf"):
+def build_pdf(filename: str = "SAFAR_AI_Architecture_Document.pdf"):
     doc = SimpleDocTemplate(
         filename,
         pagesize=letter,
@@ -184,7 +182,7 @@ def build_pdf(filename: str = "Aura_Travel_Architecture_Document.pdf"):
     story = []
 
     # ── HEADER BANNER ──────────────────────────────────────────────────────────
-    story.append(Paragraph("AURA TRAVEL — SYSTEM ARCHITECTURE", title_style))
+    story.append(Paragraph("SAFAR-AI — SYSTEM ARCHITECTURE", title_style))
     story.append(Paragraph("Multi-Agent Itinerary Engine: LangGraph Parallelism, OpenStreetMap, & Gemini", subtitle_style))
     story.append(HRFlowable(width="100%", thickness=1.5, color=SECONDARY, spaceAfter=12))
 
@@ -219,9 +217,9 @@ def build_pdf(filename: str = "Aura_Travel_Architecture_Document.pdf"):
     # ── SECTION 1: EXECUTIVE SUMMARY ───────────────────────────────────────────
     story.append(Paragraph("1. Executive Summary & Core Objective", h1_style))
     story.append(Paragraph(
-        "Aura Travel is an enterprise-grade, multi-agent travel itinerary generation engine designed to transform "
+        "SAFAR-AI is an enterprise-grade, multi-agent travel itinerary generation engine designed to transform "
         "unstructured natural-language travel requests into rich, day-by-day itineraries. Unlike conventional monolithic "
-        "travel bots that rely solely on generative hallucinations, Aura Travel employs a <b>parallel multi-agent workflow</b> "
+        "travel bots that rely solely on generative hallucinations, SAFAR-AI employs a <b>parallel multi-agent workflow</b> "
         "that queries live geospatial nodes directly from OpenStreetMap (Overpass API) while utilizing Google Gemini for intent extraction and creative synthesis.",
         body_style
     ))
@@ -382,7 +380,7 @@ def build_pdf(filename: str = "Aura_Travel_Architecture_Document.pdf"):
     story.append(Paragraph("4. High-Availability & Resilience Architecture", h1_style))
     story.append(Paragraph(
         "Production AI systems frequently encounter quota caps (HTTP 429) or transient gateway timeouts (HTTP 503/504). "
-        "Aura Travel is architected with multiple levels of defense:",
+        "SAFAR-AI is architected with multiple levels of defense:",
         body_style
     ))
 
@@ -477,7 +475,7 @@ def build_pdf(filename: str = "Aura_Travel_Architecture_Document.pdf"):
     # Summary callout
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceAfter=8))
     story.append(Paragraph(
-        "<b>Document Summary:</b> Aura Travel demonstrates how modern multi-agent architectures (LangGraph) combined with live open-source geospatial databases (OpenStreetMap) and resilient generative AI models (Gemini Flash) can deliver high-speed, hallucination-free, and visually stunning travel planning solutions.",
+        "<b>Document Summary:</b> SAFAR-AI demonstrates how modern multi-agent architectures (LangGraph) combined with live open-source geospatial databases (OpenStreetMap) and resilient generative AI models (Gemini Flash) can deliver high-speed, hallucination-free, and visually stunning travel planning solutions.",
         callout_style
     ))
 
@@ -487,5 +485,5 @@ def build_pdf(filename: str = "Aura_Travel_Architecture_Document.pdf"):
 
 
 if __name__ == "__main__":
-    output_path = os.path.join(os.path.dirname(__file__), "Aura_Travel_Architecture_Document.pdf")
+    output_path = os.path.join(os.path.dirname(__file__), "SAFAR_AI_Architecture_Document.pdf")
     build_pdf(output_path)

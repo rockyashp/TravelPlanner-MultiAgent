@@ -1,6 +1,6 @@
 """
 High-performance OpenStreetMap client with Nominatim bounding-box geocoding + Overpass.
-100% Free & Open APIs.
+100% Free & Open APIs with multi-mirror failover and fast timeouts.
 """
 from __future__ import annotations
 
@@ -8,9 +8,15 @@ import httpx
 from app.config import OVERPASS_URL
 
 _HEADERS = {
-    "User-Agent": "AuraTravelApp/1.0",
+    "User-Agent": "SAFAR-AI/1.0",
     "Accept": "*/*",
 }
+
+_OVERPASS_MIRRORS = [
+    OVERPASS_URL,
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+]
 
 # Pre-cached bounding boxes (south, west, north, east) for popular travel hubs
 _BBOX_CACHE: dict[str, tuple[float, float, float, float]] = {
@@ -24,6 +30,8 @@ _BBOX_CACHE: dict[str, tuple[float, float, float, float]] = {
     "london": (51.40, -0.30, 51.60, 0.10),
     "rome": (41.80, 12.35, 42.00, 12.60),
     "kerala": (8.30, 75.80, 12.80, 77.40),
+    "cape town": (-34.05, 18.35, -33.85, 18.55),
+    "barcelona": (41.35, 2.10, 41.45, 2.25),
 }
 
 
@@ -37,7 +45,7 @@ async def get_bounding_box(location_name: str) -> tuple[float, float, float, flo
         return _BBOX_CACHE[cleaned]
 
     try:
-        async with httpx.AsyncClient(timeout=6) as client:
+        async with httpx.AsyncClient(timeout=4, follow_redirects=True) as client:
             resp = await client.get(
                 "https://nominatim.openstreetmap.org/search",
                 params={"q": location_name, "format": "json", "limit": 1},
@@ -64,23 +72,22 @@ async def get_bounding_box(location_name: str) -> tuple[float, float, float, flo
     return (14.80, 73.60, 15.80, 74.35)
 
 
-async def query_overpass(ql: str, timeout: int = 12) -> list[dict]:
+async def query_overpass(ql: str, timeout: int = 6) -> list[dict]:
     """
-    Execute Overpass QL query with clean header.
+    Execute Overpass QL query across mirrors with fast timeout.
     """
-    try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            resp = await client.post(
-                OVERPASS_URL,
-                data={"data": ql},
-                headers=_HEADERS,
-            )
-            if resp.status_code == 200:
-                return resp.json().get("elements", [])
-            else:
-                print(f"[Overpass] status: {resp.status_code}")
-    except Exception as exc:
-        print(f"[Overpass] query notice: {exc}")
+    for mirror_url in _OVERPASS_MIRRORS:
+        try:
+            async with httpx.AsyncClient(timeout=timeout, follow_redirects=True) as client:
+                resp = await client.post(
+                    mirror_url,
+                    data={"data": ql},
+                    headers=_HEADERS,
+                )
+                if resp.status_code == 200:
+                    return resp.json().get("elements", [])
+        except Exception as exc:
+            print(f"[Overpass] Mirror '{mirror_url}' notice: {exc}")
 
     return []
 

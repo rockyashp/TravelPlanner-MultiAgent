@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({ backendOnline }) => {
           <div>
             <div className="flex items-center space-x-2">
               <span className="font-bold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-800 bg-clip-text text-transparent">
-                Aura Travel
+                SAFAR-AI
               </span>
               <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50/80 text-indigo-700 border border-indigo-200/50">
                 <Sparkles className="w-2.5 h-2.5 mr-1 text-indigo-500" />
